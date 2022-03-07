@@ -1,0 +1,16 @@
+.*
+!.gitignore
+!.reviewboardrc
+*.ipr
+*.iws
+*.ser
+local.properties
+gen
+build
+out
+class
+classes
+target
+log
+.gradle
+.idea
