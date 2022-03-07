@@ -2,10 +2,9 @@ group 'com.kona.study'
 version '1.0-SNAPSHOT'
 
 apply plugin : 'java'
-apply plugin : 'application'
+apply plugin : 'eclipse'
 apply plugin : 'org.springframework.boot'
 apply plugin : 'io.spring.dependency-management'
-apply plugin : 'groovy'
 
 buildscript {
     ext {
@@ -21,8 +20,6 @@ buildscript {
     }
 
     dependencies {
-        classpath ("org.ajoberstar:grgit:1.7.0")
-        classpath ("org.hidetake:gradle-ssh-plugin:1.3.0")
         classpath ("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
@@ -41,9 +38,9 @@ repositories {
 
 
 dependencies {
-    compile("org.projectlombok:lombok:1.16.12")
-    compile("com.konasl.commonlibs.sb2:spring-web:4.0.0")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+    compile('org.springframework.boot:spring-boot-starter-web')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 
