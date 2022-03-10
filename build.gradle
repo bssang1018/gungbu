@@ -44,6 +44,8 @@ dependencies {
     compile('org.projectlombok:lombok')
     compile('com.h2database:h2')
 
+    compile('org.springframework.boot:spring-boot-starter-aop')
+
     compile("org.springframework.boot:spring-boot-configuration-processor")
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

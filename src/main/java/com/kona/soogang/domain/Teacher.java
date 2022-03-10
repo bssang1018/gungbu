@@ -14,11 +14,14 @@ import java.util.List;
 public class Teacher {
 
     @Id
-    private String teacher_id;
+    @Column(name="teacher_id")
+    private String id;
 
-    private String teacher_pw;
+    @Column(name="teacher_pw")
+    private String pw;
 
-    private String teacher_name;
+    @Column(name="teacher_name")
+    private String name;
 
 //    @Builder
 //    public Teacher(String teacher_id, String teacher_name, String teacher_pw){

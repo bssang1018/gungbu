@@ -14,7 +14,7 @@ public class LoginService {
 
     public String login(String id, String pw) {
         if (id.contains("@")){
-            if(studentRepository.findById(id).get().getStudent_email().equals(id)) {
+            if(studentRepository.findById(id).get().getEmail().equals(id)) {
                 System.out.println("### 학생으로 로그인 했습니다. ###");
                 return "성공";
             }else{
@@ -22,7 +22,7 @@ public class LoginService {
             }
 
         }else{
-            if(teacherRepository.findById(id).get().getTeacher_id().equals(id)) {
+            if(teacherRepository.findById(id).get().getId().equals(id)) {
                 System.out.println("### 선생으로 로그인 했습니다. ###");
                 return "성공";
             }else{

@@ -17,19 +17,19 @@ public class StudentService {
     private final StudentRepository studentRepository;
 
     //학생 회원 등록
-    public void studentJoin(String student_email, String student_pw, String student_name) {
+    public void studentJoin(String email, String pw, String name) {
 
         Student student = new Student();
-        student.setStudent_email(student_email);
-        student.setStudent_pw(student_pw);
-        student.setStudent_name(student_name);
+        student.setEmail(email);
+        student.setPw(pw);
+        student.setName(name);
 
         //강사의 추천을 확인
-        if (recomendCheck(student_email).equals("추천")) {
-            student.setJoin_status("BY");
+        if (recomendCheck(email).equals("추천")) {
+            student.setJoinStatus("BY");
             //BY : 사전에 추천받았고, 현재 가입한 상태
         }else{
-            student.setJoin_status("NO");
+            student.setJoinStatus("NO");
             //NO : 추천을 받지 못한 상태
         }
 
@@ -37,16 +37,16 @@ public class StudentService {
     }
 
     //학생 추천 여부 체크
-    public String recomendCheck(String student_email){
+    public String recomendCheck(String email){
 
         System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        System.out.println(studentRepository.findById(student_email));
-        studentRepository.findById(student_email).getClass();
+        System.out.println(studentRepository.findById(email));
+        studentRepository.findById(email).getClass();
         System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-        Optional<Student> student = studentRepository.findById(student_email);
+        Optional<Student> student = studentRepository.findById(email);
 
-        if(student.isPresent() && !student.get().getStudent_email().equals(null)) {
+        if(student.isPresent() && !student.get().getEmail().equals(null)) {
             System.out.println("### 강사의 추천을 받은 이메일 입니다. ###");
             return "추천";
         }else{

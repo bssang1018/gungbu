@@ -11,15 +11,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TeacherReqDto {
 
-    private String teacher_id;
-    private String teacher_name;
-    private String teacher_pw;
+    private String id;
+    private String name;
+    private String pw;
 
     @Builder
-    public TeacherReqDto(String teacher_id, String teacher_name, String teacher_pw){
-        this.teacher_id = teacher_id;
-        this.teacher_name = teacher_name;
-        this.teacher_pw = teacher_pw;
+    public TeacherReqDto(String id, String name, String pw){
+        this.id = id;
+        this.name = name;
+        this.pw = pw;
     }
 
     //필요없을 듯...

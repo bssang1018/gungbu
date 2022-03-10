@@ -12,15 +12,20 @@ import javax.persistence.*;
 public class Student {
 
     @Id
-    private String student_email;
+    @Column(name="student_email")
+    private String email;
 
-    private String student_name;
+    @Column(name="student_name")
+    private String name;
 
-    private String student_pw;
+    @Column(name="student_pw")
+    private String pw;
 
-    private String join_status;
+    @Column(name="join_status")
+    private String joinStatus;
 
-    private String recomended_teacher_id;
+    @Column(name="recommended_teacher_id")
+    private String recommendedTeacherId;
 
 
 //    @Builder
