@@ -1,6 +1,7 @@
 package com.kona.soogang.service;
 
 import com.kona.soogang.domain.Student;
+import com.kona.soogang.domain.StudentRepository;
 import com.kona.soogang.domain.Teacher;
 import com.kona.soogang.domain.TeacherRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final HttpServletRequest httpServletRequest;
+    private final StudentRepository studentRepository;
 
     // 교사 회원가입
     @Transactional
@@ -61,7 +63,39 @@ public class TeacherService {
         return loginMent;
     }
 
-    public String currentId(){
-        return (String) httpServletRequest.getSession().getAttribute("loginId");
+
+    public String recommend(String email, HttpSession session) {
+
+        String teacherId = (String) session.getAttribute("loginId");
+        System.out.println("강사아이디 확인용 :: " + teacherId);
+        String recommendMent = "";
+
+        List<Student> recommendResult = studentRepository.findByEmail(email);
+
+        Student student = new Student();
+        student.getTeacher().setId(teacherId);
+        student.setEmail(email);
+        studentRepository.save(student);
+
+        return "???";
+
+//        if(recommendResult.isEmpty()){ // 이메일이 없으면 사전추천, 미가입 상태로 BN
+//            student.setEmail(email);
+//            student.setJoinStatus("BN");
+//            studentRepository.save(student);
+//            recommendMent = email + " 을 추천했습니다.";
+//            return recommendMent;
+//        }
+//
+//        if(recommendResult.get(0).getJoinStatus() == "NO"){
+//            student.setJoinStatus("AY");
+//            studentRepository.save(student);
+//            recommendMent = email + " 을 추천했습니다.";
+//            return recommendMent;
+//        }else{
+//            recommendMent = email + " 은 이미 추천받았습니다.";
+//            return recommendMent;
+//        }
+
     }
 }

@@ -28,4 +28,11 @@ public class TeacherContorller {
         return teacherService.teacherLogin(id, pw, session);
     }
 
+    //학생 추천
+    @GetMapping(value = "/recommend/{email}")
+    public String recommend(@PathVariable String email, HttpSession session){
+        System.out.println("추천할 이메일 :: " + email);
+        return teacherService.recommend(email, session);
+    }
+
 }

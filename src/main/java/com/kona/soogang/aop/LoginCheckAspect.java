@@ -23,13 +23,12 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor
 public class LoginCheckAspect {
 
-    private final TeacherService teacherService;
-    private final CommonController commonController;
+    private final LoginService loginService;
 
     @Before("@annotation(LoginCheck)")
     public void loginCheck() throws HttpClientErrorException{
 
-        String currentId = teacherService.currentId();
+        String currentId = loginService.currentId();
 
         if (currentId == null){
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);

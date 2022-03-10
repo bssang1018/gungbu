@@ -5,12 +5,15 @@ import com.kona.soogang.domain.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 @RequiredArgsConstructor
 public class LoginService {
 
-    private TeacherRepository teacherRepository;
-    private StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final HttpServletRequest httpServletRequest;
 
     public String login(String id, String pw) {
         if (id.contains("@")){
@@ -31,5 +34,9 @@ public class LoginService {
 
         }
         return "실패";
+    }
+
+    public String currentId(){
+        return (String) httpServletRequest.getSession().getAttribute("loginId");
     }
 }

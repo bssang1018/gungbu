@@ -8,7 +8,9 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpSession;
 import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +21,7 @@ public class StudentService {
 
     //학생 회원가입
     @Transactional
-    public void studentJoin(String email, String pw, String name) {
+    public String studentJoin(String email, String pw, String name) {
 
         Student student = new Student();
         student.setEmail(email);
@@ -33,6 +35,9 @@ public class StudentService {
         student.setJoinStatus(recommendResult);
 
         studentRepository.save(student);
+
+        String joinMent = email + "님! 가입이 되었습니다.";
+        return joinMent;
     }
 
     //학생 추천 여부 체크
@@ -52,5 +57,21 @@ public class StudentService {
         }else{
             return "NO"; //사전 추천 받지 못한경우, NO
         }
+    }
+
+    public String studentLogin(String email, String pw, HttpSession session) {
+        List<Student> loginResult = studentRepository.findByEmailAndPw(email, pw);
+        if (loginResult.isEmpty()){
+            throw new IllegalStateException("INFO :: login fail!");
+        }
+
+        session.setAttribute("loginId", email);
+
+        String sessionCheck = (String) session.getAttribute("loginEmail");
+        System.out.println("세션에 값 정상적으로 들어갔는지 확인:: " + sessionCheck);
+
+        String loginMent = email + "님! 로그인 됐습니다!";
+        return loginMent;
+
     }
 }
