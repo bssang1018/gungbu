@@ -24,8 +24,9 @@ public class Student {
     @Column(name="join_status")
     private String joinStatus;
 
-    @Column(name="recommended_teacher_id")
-    private String recommendedTeacherId;
+    @ManyToOne
+    @JoinColumn(name="recommended_teacher_id")
+    public Teacher teacher;
 
 
 //    @Builder

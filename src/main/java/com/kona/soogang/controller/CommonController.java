@@ -16,7 +16,7 @@ public class CommonController {
         return "안녕하세요! 만나서 반갑습니다.";
     }
 
-    @LoginCheck
+    @LoginCheck //aop 로그인 상태 체크
     @GetMapping(value = "/logout")
     public String logout(HttpSession session){
         String nowLoginId = (String) session.getAttribute("loginId");

@@ -21,6 +21,7 @@ public class TeacherContorller {
         return teacherService.teacherJoin(id, pw, name);
     }
 
+    //강사 로그인
     @GetMapping(value= "/login/{id}/{pw}")
     public String teacherLogin(@PathVariable String id, @PathVariable String pw, HttpSession session){
         System.out.println("teacher login 파라미터 확인 :: " + id + " / " + pw);

@@ -6,6 +6,7 @@ import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.text.html.Option;
 import java.util.Optional;
@@ -16,7 +17,8 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
 
-    //학생 회원 등록
+    //학생 회원가입
+    @Transactional
     public void studentJoin(String email, String pw, String name) {
 
         Student student = new Student();
@@ -25,33 +27,30 @@ public class StudentService {
         student.setName(name);
 
         //강사의 추천을 확인
-        if (recomendCheck(email).equals("추천")) {
-            student.setJoinStatus("BY");
-            //BY : 사전에 추천받았고, 현재 가입한 상태
-        }else{
-            student.setJoinStatus("NO");
-            //NO : 추천을 받지 못한 상태
-        }
+        String recommendResult = recommendCheck(email);
+        System.out.println("추천여부 확인 결과 :: "+recommendResult);
+
+        student.setJoinStatus(recommendResult);
 
         studentRepository.save(student);
     }
 
     //학생 추천 여부 체크
-    public String recomendCheck(String email){
+    public String recommendCheck(String email){
 
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        System.out.println(studentRepository.findById(email));
-        studentRepository.findById(email).getClass();
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        Optional<Student> studentOptional = studentRepository.findById(email);
 
-        Optional<Student> student = studentRepository.findById(email);
+        if (!studentOptional.isPresent()) { //중복없으면 따질것도 없이 신규 가입
 
-        if(student.isPresent() && !student.get().getEmail().equals(null)) {
-            System.out.println("### 강사의 추천을 받은 이메일 입니다. ###");
-            return "추천";
+            return "NO";
+        }
+
+        Student student = studentOptional.get();
+
+        if (student.getEmail()==email && student.getJoinStatus()=="BN"){ //BN은 사전에 추천받았지만, 미가입상태
+            return "BY"; //가입 상태로 업데이트
         }else{
-            System.out.println("### 추천 기록이 없습니다. 일반회원으로 가입 됩니다. ###");
-            return "미추천";
+            return "NO"; //사전 추천 받지 못한경우, NO
         }
     }
 }
