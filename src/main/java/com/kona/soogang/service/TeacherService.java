@@ -72,30 +72,33 @@ public class TeacherService {
 
         List<Student> recommendResult = studentRepository.findByEmail(email);
 
+        Teacher teacher = new Teacher();
+        teacher.setId(teacherId);
+        teacherRepository.save(teacher);
+
         Student student = new Student();
-        student.getTeacher().setId(teacherId);
-        student.setEmail(email);
-        studentRepository.save(student);
 
-        return "???";
+        if(recommendResult.isEmpty()){ // 이메일이 없으면 사전추천, 미가입 상태로 BN
+            student.setTeacher(teacher);
+            student.setEmail(email);
+            student.setJoinStatus("BN");
+            studentRepository.save(student);
+            recommendMent = email + " 을 추천했습니다.";
+            return recommendMent;
+        }
 
-//        if(recommendResult.isEmpty()){ // 이메일이 없으면 사전추천, 미가입 상태로 BN
-//            student.setEmail(email);
-//            student.setJoinStatus("BN");
-//            studentRepository.save(student);
-//            recommendMent = email + " 을 추천했습니다.";
-//            return recommendMent;
-//        }
-//
-//        if(recommendResult.get(0).getJoinStatus() == "NO"){
-//            student.setJoinStatus("AY");
-//            studentRepository.save(student);
-//            recommendMent = email + " 을 추천했습니다.";
-//            return recommendMent;
-//        }else{
-//            recommendMent = email + " 은 이미 추천받았습니다.";
-//            return recommendMent;
-//        }
+        if(recommendResult.get(0).getJoinStatus() == "NO"){
+            student.setTeacher(teacher);
+            student.setEmail(email);
+            student.setJoinStatus("AY");
+            studentRepository.save(student);
+            recommendMent = email + " 을 추천했습니다.";
+            return recommendMent;
+
+        }else{
+            recommendMent = email + " 은 이미 추천받았습니다.";
+            throw new IllegalStateException("INFO :: that email was already recommended");
+        }
 
     }
 }

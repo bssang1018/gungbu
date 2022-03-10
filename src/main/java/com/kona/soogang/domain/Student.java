@@ -24,7 +24,7 @@ public class Student {
     @Column(name="join_status")
     private String joinStatus;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = Teacher.class)
     @JoinColumn(name="teacher_id")
     public Teacher teacher;
 
