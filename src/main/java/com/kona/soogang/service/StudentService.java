@@ -1,9 +1,6 @@
 package com.kona.soogang.service;
 
-import com.kona.soogang.domain.Lecture;
-import com.kona.soogang.domain.LectureRepository;
-import com.kona.soogang.domain.Student;
-import com.kona.soogang.domain.StudentRepository;
+import com.kona.soogang.domain.*;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -21,6 +18,7 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
+    private final RegisterRepository registerRepository;
 
     //학생 회원가입
     @Transactional
@@ -116,14 +114,19 @@ public class StudentService {
         Optional<Lecture> lecture = lectureRepository.findByLectureName(lectureName);
 
         //인원수 체크하면서, 신청가능한지 부터.
-        int maxPerson = lecture.get().getMaxPerson();
-
+        //int maxPerson = lecture.get().getMaxPerson();
 
         //중복신청 체크
 
         //추천 여부에 따라, 인원수 상관없이 신청 가능
 
+        //수강 신청 등록
+        RegisterId registerId = new RegisterId(lectureName, email);
+        Register register = new Register();
+        register.setRegisterId(registerId);
+        register.setCancelStatus("NO");
+        registerRepository.save(register);
 
-        return "";
+        return "으악";
     }
 }

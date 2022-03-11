@@ -14,17 +14,11 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Register {
 
+    //복합키
+    @EmbeddedId
+    private RegisterId registerId;
+
     @Column(name="cancel_status")
     private String cancelStatus;
-
-    @Id
-    @ManyToOne
-    @JoinColumn(name="lecture_name")
-    private Lecture lecture;
-
-    @Id
-    @ManyToOne
-    @JoinColumn(name="student_name")
-    private Student student;
 
 }
