@@ -28,6 +28,9 @@ public class StudentService {
         student.setPw(pw);
         student.setName(name);
 
+        //이메일 중복 체크
+        validateDuplicateCheck(email);
+
         //강사의 추천을 확인
         String recommendResult = recommendCheck(email);
         System.out.println("추천여부 확인 결과 :: "+recommendResult);
@@ -38,6 +41,15 @@ public class StudentService {
 
         String joinMent = email + "님! 가입이 되었습니다.";
         return joinMent;
+    }
+
+    //이메일 중복 체크
+    public void validateDuplicateCheck(String email){
+        Optional<Student> duplicateResult = studentRepository.findById(email);
+
+        if (duplicateResult.isPresent() && !duplicateResult.get().getJoinStatus().equals("BN")) { //조회 결과가 유효하면서 AY,NO,BY 면 예외. 중복 이메일이라는 뜻
+            throw new IllegalStateException("INFO :: already exist email");
+        }
     }
 
     //학생 추천 여부 체크

@@ -1,10 +1,12 @@
 package com.kona.soogang.controller;
 
+import com.kona.soogang.aop.LoginCheck;
 import com.kona.soogang.service.TeacherService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @RequestMapping("/teacher")
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpSession;
 public class TeacherContorller {
 
     private final TeacherService teacherService;
+    private final HttpServletRequest httpServletRequest;
 
     //강사 가입
     @GetMapping(value = "/join/{id}/{pw}/{name}")
@@ -29,10 +32,17 @@ public class TeacherContorller {
     }
 
     //학생 추천
+    @LoginCheck
     @GetMapping(value = "/recommend/{email}")
     public String recommend(@PathVariable String email, HttpSession session){
         System.out.println("추천할 이메일 :: " + email);
         return teacherService.recommend(email, session);
     }
 
+    @LoginCheck
+    @GetMapping(value = "lectureInsert/{lectureName}")
+    public String lectureInsert(@PathVariable String lectureName, HttpSession session){
+        System.out.println("등록할 강의명 :: " + lectureName);
+        return teacherService.lectureInsert(lectureName, session);
+    }
 }

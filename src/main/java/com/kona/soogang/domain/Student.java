@@ -3,6 +3,8 @@ package com.kona.soogang.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Data
@@ -24,11 +26,10 @@ public class Student {
     @Column(name="join_status")
     private String joinStatus;
 
-    @ManyToOne(targetEntity = Teacher.class)
+    //연관관계 매핑
+    @ManyToOne
     @JoinColumn(name="teacher_id")
-    public Teacher teacher;
-
-
+    private Teacher teacher;
 
 //    @Builder
 //    public Student(Teacher teacher_id, String student_email, String student_name, String student_pw, String join_status){

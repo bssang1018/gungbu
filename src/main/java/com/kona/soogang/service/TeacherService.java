@@ -1,13 +1,11 @@
 package com.kona.soogang.service;
 
-import com.kona.soogang.domain.Student;
-import com.kona.soogang.domain.StudentRepository;
-import com.kona.soogang.domain.Teacher;
-import com.kona.soogang.domain.TeacherRepository;
+import com.kona.soogang.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -19,8 +17,8 @@ import java.util.Optional;
 public class TeacherService {
 
     private final TeacherRepository teacherRepository;
-    private final HttpServletRequest httpServletRequest;
     private final StudentRepository studentRepository;
+    private final LectureRepository lectureRepository;
 
     // 교사 회원가입
     @Transactional
@@ -37,6 +35,35 @@ public class TeacherService {
 
         String joinMent = id + "님! 가입이 되었습니다.";
         return joinMent;
+    }
+
+    @Transactional
+    public String lectureInsert(String lectureName, HttpSession session){
+        validateDuplicateLecture(lectureName);
+
+        String teacherId = (String) session.getAttribute("loginId");
+
+        Teacher teacher = new Teacher();
+        teacher.setId(teacherId);
+        teacherRepository.save(teacher);
+
+        Lecture lecture = new Lecture();
+
+        lecture.setTeacher(teacher);
+        lecture.setLectureName(lectureName);
+        lecture.setCloseStatus("NO");
+
+        lectureRepository.save(lecture);
+
+        String lectureInsertMent = '"' + lectureName + '"' + "강의가 등록됐습니다.";
+        return lectureInsertMent;
+    }
+
+    private void validateDuplicateLecture(String lectureName){
+        Optional<Lecture> LectureDuplicateResult = lectureRepository.findByLectureName(lectureName);
+        if (LectureDuplicateResult.isPresent()){
+            throw new IllegalStateException("INFO :: already exist lecture name");
+        }
     }
 
     // id 중복검사 메서드
@@ -64,41 +91,40 @@ public class TeacherService {
     }
 
 
+    @Transactional
     public String recommend(String email, HttpSession session) {
 
         String teacherId = (String) session.getAttribute("loginId");
         System.out.println("강사아이디 확인용 :: " + teacherId);
         String recommendMent = "";
 
-        List<Student> recommendResult = studentRepository.findByEmail(email);
+        // 등록하려는 이메일이 테이블에 있는지 확인하기 위함
+        Optional<Student> recommendResult = studentRepository.findById(email);
 
         Teacher teacher = new Teacher();
         teacher.setId(teacherId);
-        teacherRepository.save(teacher);
-
         Student student = new Student();
+        student.setTeacher(teacher);
 
-        if(recommendResult.isEmpty()){ // 이메일이 없으면 사전추천, 미가입 상태로 BN
-            student.setTeacher(teacher);
+        if(!recommendResult.isPresent()){ // 이메일이 없으면 사전추천, 미가입 상태로 BN => INSERT
             student.setEmail(email);
             student.setJoinStatus("BN");
             studentRepository.save(student);
-            recommendMent = email + " 을 추천했습니다.";
+
+            recommendMent = email + " 을 추천하고 새로운 계정으로 등록했습니다.";
             return recommendMent;
         }
 
-        if(recommendResult.get(0).getJoinStatus() == "NO"){
-            student.setTeacher(teacher);
-            student.setEmail(email);
-            student.setJoinStatus("AY");
-            studentRepository.save(student);
+        if(recommendResult.isPresent() && recommendResult.get().getJoinStatus().equals("NO")) { //강사아이디랑, 상태만 => UPDATE
+            studentRepository.recommendUpdate("AY", teacherId, email);
             recommendMent = email + " 을 추천했습니다.";
             return recommendMent;
-
         }else{
-            recommendMent = email + " 은 이미 추천받았습니다.";
             throw new IllegalStateException("INFO :: that email was already recommended");
         }
 
     }
 }
+
+
+

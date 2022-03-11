@@ -5,11 +5,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
 public class CommonController {
+
+    // 세션
+    private final HttpServletRequest httpServletRequest;
+
+    // 세션에서 아이디 가져오기
+    public String currentId(){
+        String loginId = (String) httpServletRequest.getSession().getAttribute("loginId");
+        System.out.println("loginId :: " + loginId);
+        return loginId;
+    }
 
     @GetMapping(value = "/")
     public String firstPage(){
