@@ -22,7 +22,8 @@ public class Lecture {
     @Column(name="close_status")
     private String closeStatus;
 
-    @ManyToOne(targetEntity = Teacher.class)
+    //연관관계 매핑
+    @ManyToOne
     @JoinColumn(name="teacher_id")
     public Teacher teacher;
 

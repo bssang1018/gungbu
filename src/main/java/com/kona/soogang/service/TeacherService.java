@@ -20,7 +20,7 @@ public class TeacherService {
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
 
-    // 교사 회원가입
+    // 강사 회원가입
     @Transactional
     public String teacherJoin(String id, String pw, String name) {
         Teacher teacher = new Teacher();
@@ -45,8 +45,6 @@ public class TeacherService {
 
         Teacher teacher = new Teacher();
         teacher.setId(teacherId);
-        teacherRepository.save(teacher);
-
         Lecture lecture = new Lecture();
 
         lecture.setTeacher(teacher);

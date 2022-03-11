@@ -39,10 +39,15 @@ public class TeacherContorller {
         return teacherService.recommend(email, session);
     }
 
+    //강의 등록
     @LoginCheck
     @GetMapping(value = "lectureInsert/{lectureName}")
     public String lectureInsert(@PathVariable String lectureName, HttpSession session){
         System.out.println("등록할 강의명 :: " + lectureName);
         return teacherService.lectureInsert(lectureName, session);
     }
+
+    //강의 수정
+
+
 }
