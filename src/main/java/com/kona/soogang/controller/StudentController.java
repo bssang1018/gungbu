@@ -31,4 +31,17 @@ public class StudentController {
         return studentService.studentLogin(email, pw, session);
     }
 
+    //나를 추천한 강사의 이름 확인
+    @GetMapping(value = "/recommendedMe")
+    public StringBuffer recommendedMe(HttpSession session){
+        return studentService.recommendedMe(session);
+    }
+
+    //수강신청
+    @GetMapping(value = "/lectureRegister/{lectureName}")
+    public String lectureRegister(@PathVariable String lectureName, HttpSession session){
+        return studentService.lectureRegister(lectureName, session);
+    }
+
+    //수강취소
 }

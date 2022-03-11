@@ -18,6 +18,7 @@ public class CommonService {
 
     public List<LectureDto> lectureList() {
         List<Lecture> lectureList = lectureRepository.findAll();
+        // 스트림 사용해 보기
         return lectureList.stream().map(LectureDto::new).collect(Collectors.toList());
     }
 }

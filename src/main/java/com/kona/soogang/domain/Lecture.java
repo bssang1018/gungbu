@@ -22,6 +22,9 @@ public class Lecture {
     @Column(name="close_status")
     private String closeStatus;
 
+    @Column(name="max_Person")
+    private int maxPerson;
+
     //연관관계 매핑
     @ManyToOne
     @JoinColumn(name="teacher_id")

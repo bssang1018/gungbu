@@ -1,5 +1,7 @@
 package com.kona.soogang.service;
 
+import com.kona.soogang.domain.Lecture;
+import com.kona.soogang.domain.LectureRepository;
 import com.kona.soogang.domain.Student;
 import com.kona.soogang.domain.StudentRepository;
 import javassist.NotFoundException;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final LectureRepository lectureRepository;
 
     //학생 회원가입
     @Transactional
@@ -85,5 +88,42 @@ public class StudentService {
         String loginMent = email + "님! 로그인 됐습니다!";
         return loginMent;
 
+    }
+
+    public StringBuffer recommendedMe(HttpSession session) {
+        String email = (String) session.getAttribute("loginId");
+        Optional<Student> result = studentRepository.findById(email);
+
+        StringBuffer sb = new StringBuffer();
+
+        if(!result.isPresent()){ //조회한 결과 없다면
+            sb.append("추천을 받지 못했습니다.");
+            return sb;
+        }
+
+        sb.append("나를 추천한 강사의 아이디는 ");
+        sb.append(result.get().getTeacher().getId());
+        sb.append(" 입니다.\r\n");
+        sb.append("강사의 이름은 ");
+        sb.append(result.get().getTeacher().getName());
+        sb.append(" 입니다.");
+        return sb;
+    }
+
+
+    public String lectureRegister(String lectureName,HttpSession session) {
+        String email = (String) session.getAttribute("loginId");
+        Optional<Lecture> lecture = lectureRepository.findByLectureName(lectureName);
+
+        //인원수 체크하면서, 신청가능한지 부터.
+        int maxPerson = lecture.get().getMaxPerson();
+
+
+        //중복신청 체크
+
+        //추천 여부에 따라, 인원수 상관없이 신청 가능
+
+
+        return "";
     }
 }

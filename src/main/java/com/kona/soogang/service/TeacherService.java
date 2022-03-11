@@ -38,7 +38,7 @@ public class TeacherService {
     }
 
     @Transactional
-    public String lectureInsert(String lectureName, HttpSession session){
+    public String lectureInsert(String lectureName, int maxPerson, HttpSession session){
         validateDuplicateLecture(lectureName);
 
         String teacherId = (String) session.getAttribute("loginId");
@@ -49,6 +49,7 @@ public class TeacherService {
 
         lecture.setTeacher(teacher);
         lecture.setLectureName(lectureName);
+        lecture.setMaxPerson(maxPerson);
         lecture.setCloseStatus("NO");
 
         lectureRepository.save(lecture);
@@ -107,6 +108,7 @@ public class TeacherService {
         if(!recommendResult.isPresent()){ // 이메일이 없으면 사전추천, 미가입 상태로 BN => INSERT
             student.setEmail(email);
             student.setJoinStatus("BN");
+            student.setTeacher(teacher);
             studentRepository.save(student);
 
             recommendMent = email + " 을 추천하고 새로운 계정으로 등록했습니다.";
