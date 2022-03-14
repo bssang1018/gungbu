@@ -40,8 +40,14 @@ public class StudentController {
     //수강신청
     @GetMapping(value = "/lectureRegister/{lectureName}")
     public String lectureRegister(@PathVariable String lectureName, HttpSession session){
+        System.out.println("수강신청 파라미터 확인 :: " + lectureName);
         return studentService.lectureRegister(lectureName, session);
     }
 
     //수강취소
+
+
+    //수강신청 조회
+
+
 }

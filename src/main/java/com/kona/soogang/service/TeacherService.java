@@ -59,8 +59,8 @@ public class TeacherService {
     }
 
     private void validateDuplicateLecture(String lectureName){
-        Optional<Lecture> LectureDuplicateResult = lectureRepository.findByLectureName(lectureName);
-        if (LectureDuplicateResult.isPresent()){
+        List<Lecture> LectureDuplicateResult = lectureRepository.findByLectureName(lectureName);
+        if (!LectureDuplicateResult.isEmpty()){ //엠프티 하지 않다면 중복 검색 결과가 있으니까, 예외
             throw new IllegalStateException("INFO :: already exist lecture name");
         }
     }

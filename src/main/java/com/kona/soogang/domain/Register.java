@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Builder
@@ -20,5 +21,9 @@ public class Register {
 
     @Column(name="cancel_status")
     private String cancelStatus;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timestamp;
+
 
 }

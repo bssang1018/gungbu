@@ -25,6 +25,11 @@ public class Student {
 
     @Column(name="join_status")
     private String joinStatus;
+    //BY: 회원가입전에 추천받음, 현재 미가입상태
+    //BN: 회원가입전에 추천받음, 현재 가입상태
+    //AY: 회원가입후에 추천받음
+
+    //NO: 추천받지 못함
 
     //연관관계 매핑
     @ManyToOne

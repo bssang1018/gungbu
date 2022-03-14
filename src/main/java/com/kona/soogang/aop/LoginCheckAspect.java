@@ -1,6 +1,7 @@
 package com.kona.soogang.aop;
 
 import com.kona.soogang.controller.CommonController;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;

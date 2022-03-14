@@ -1,5 +1,6 @@
 package com.kona.soogang.service;
 
+import com.kona.soogang.aop.LoginCheck;
 import com.kona.soogang.domain.*;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import javax.swing.text.html.Option;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,11 +79,7 @@ public class StudentService {
         if (loginResult.isEmpty()){
             throw new IllegalStateException("INFO :: login fail!");
         }
-
         session.setAttribute("loginId", email);
-
-        String sessionCheck = (String) session.getAttribute("loginEmail");
-        System.out.println("세션에 값 정상적으로 들어갔는지 확인:: " + sessionCheck);
 
         String loginMent = email + "님! 로그인 됐습니다!";
         return loginMent;
@@ -108,25 +106,54 @@ public class StudentService {
         return sb;
     }
 
-
+    //수강신청
+    @LoginCheck
+    @Transactional
     public String lectureRegister(String lectureName,HttpSession session) {
         String email = (String) session.getAttribute("loginId");
-        Optional<Lecture> lecture = lectureRepository.findByLectureName(lectureName);
 
-        //인원수 체크하면서, 신청가능한지 부터.
-        //int maxPerson = lecture.get().getMaxPerson();
+        //강의 테이블에서 강의명으로 코드 조회
+        Long lectureCode = lectureRepository.findByLectureName(lectureName).get(0).getLectureCode();
 
-        //중복신청 체크
+        //1. 수용인원과 추천여부 따져보기
+        List<Lecture> lecture = lectureRepository.findByLectureName(lectureName);
+        //최대 인원
+        int maxPerson = lecture.get(0).getMaxPerson();
+        System.out.println("@@@@@@ maxPerson:: "+ maxPerson);
+        //강의명으로 현재 신청 인원수 파악
+        int registersCount = registerRepository.countRegistered(lectureName);
+        System.out.println("@@@@@@ registersCount:: " + registersCount);
+        //추천 여부
+        String joinStatus = studentRepository.findById(email).get().getJoinStatus();
+        System.out.println("joinStatus:: "+joinStatus);
 
-        //추천 여부에 따라, 인원수 상관없이 신청 가능
+        if (registersCount >= maxPerson && joinStatus.equals("NO")){ //인원이 맥스 이상이고, 추천학생이 아닌 경우 팅궈 => 둘다 만족해야 팅궈
+            throw new IllegalStateException("INFO:: this lecture is already full");
+        }
+        //인원을 초과히지 않는 경우는 정상 진행
+        //추천받은 학생인 경우 정상 진행 ("BN","AY")
+        
+        //2. 중복신청 체크
+        RegisterId registerId = new RegisterId();
+        registerId.setLectureCode(lectureCode);
+        registerId.setStudentName(email);
+        List<Register> RegisterForDuplicate = registerRepository.findByRegisterId(registerId);
 
-        //수강 신청 등록
-        RegisterId registerId = new RegisterId(lectureName, email);
+        if (!RegisterForDuplicate.isEmpty()){ //결과가 비어있냐?? 아니! => 결과가 있다는 뜻! 고로 중복
+            throw new IllegalStateException("INFO:: you have already registered to this lecture");
+        }
+
+        //3. 위에 두개 다 통과했다면, 수강 신청 가능
         Register register = new Register();
         register.setRegisterId(registerId);
         register.setCancelStatus("NO");
+
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        register.setTimestamp(timestamp);
+
         registerRepository.save(register);
 
-        return "으악";
+        String registerMent = '"'+lectureName+'"'+ " 강의를 수강 신청 했습니다.";
+        return registerMent;
     }
 }
