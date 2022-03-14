@@ -1,6 +1,7 @@
 package com.kona.soogang.service;
 
 import com.kona.soogang.domain.*;
+import com.kona.soogang.dto.StudentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,11 @@ public class TeacherService {
 
     @Transactional
     public String lectureInsert(String lectureName, int maxPerson, HttpSession session){
+
+        if (maxPerson > 100){
+            throw new IllegalStateException("INFO:: the maximum number of participants is 100.");
+        }
+
         validateDuplicateLecture(lectureName);
 
         String teacherId = (String) session.getAttribute("loginId");
@@ -123,6 +130,14 @@ public class TeacherService {
             throw new IllegalStateException("INFO :: that email was already recommended");
         }
 
+    }
+
+    public List<StudentDto> recommendedStudentList(HttpSession session) {
+        String email = (String) session.getAttribute("loginId");
+
+        List<Student> studentList = studentRepository.recommendedStudentList();
+
+        return studentList.stream().map(StudentDto::new).collect(Collectors.toList());
     }
 }
 

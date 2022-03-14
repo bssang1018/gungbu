@@ -2,6 +2,7 @@ package com.kona.soogang.service;
 
 import com.kona.soogang.aop.LoginCheck;
 import com.kona.soogang.domain.*;
+import com.kona.soogang.dto.RegisterDto;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -13,6 +14,7 @@ import javax.swing.text.html.Option;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -175,11 +177,21 @@ public class StudentService {
 
         if(registerRepository.findByRegisterId(registerId).get(0).getCancelStatus().equals("YES")){
             return "이미 취소한 강의입니다.";
-        };
+        }
 
         registerRepository.registerCancel(lectureCode, email);
 
         String cancelMent = '"'+lectureName+'"'+ " 강의 수강을 취소했습니다.";
         return cancelMent;
+    }
+
+    @LoginCheck
+    @Transactional
+    public List<RegisterDto> registerList(HttpSession session) {
+        String email = (String) session.getAttribute("loginId");
+
+        List<Register> registerList = registerRepository.findByStudentEmail(email);
+
+        return registerList.stream().map(RegisterDto::new).collect(Collectors.toList());
     }
 }

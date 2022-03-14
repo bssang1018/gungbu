@@ -1,6 +1,7 @@
 package com.kona.soogang.controller;
 
 import com.kona.soogang.aop.LoginCheck;
+import com.kona.soogang.dto.StudentDto;
 import com.kona.soogang.service.TeacherService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RequestMapping("/teacher")
 @RestController
@@ -47,5 +49,11 @@ public class TeacherContorller {
         return teacherService.lectureInsert(lectureName, maxPerson, session);
     }
 
+    //강사의 추천으로 등록한 회원의 정보
+    @LoginCheck
+    @GetMapping(value = "/recommendedStudentList")
+    public List<StudentDto> recommendedStudentList(HttpSession session){
+        return teacherService.recommendedStudentList(session);
+    }
 
 }

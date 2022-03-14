@@ -1,5 +1,6 @@
 package com.kona.soogang.controller;
 
+import com.kona.soogang.dto.RegisterDto;
 import com.kona.soogang.service.StudentService;
 import com.kona.soogang.service.TeacherService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RequestMapping("/student")
 @RestController
@@ -52,6 +54,10 @@ public class StudentController {
     }
 
     //수강신청 조회
+    @GetMapping(value = "/registerList")
+    public List<RegisterDto> registerList(HttpSession session){
+        return studentService.registerList(session);
+    }
 
 
 }

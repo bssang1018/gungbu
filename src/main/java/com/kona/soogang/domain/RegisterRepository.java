@@ -20,4 +20,7 @@ public interface RegisterRepository extends JpaRepository<Register, RegisterId> 
             , nativeQuery = true)
     void registerCancel(Long lectureCode, String email);
 
+    @Query(value = "SELECT * FROM register WHERE student_email=?1"
+            , nativeQuery = true)
+    List<Register> findByStudentEmail(String email);
 }
