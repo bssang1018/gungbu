@@ -16,14 +16,13 @@ import java.util.Date;
 @Embeddable
 @NoArgsConstructor
 public class RegisterId implements Serializable {
-
     //복합키 관리 클래스
-    
+
     @Column(name="lecture_code")
     private Long lectureCode;
 
-    @Column(name="student_name")
-    private String studentName;
+    @Column(name="student_email")
+    private String studentEmail;
 
 }
 

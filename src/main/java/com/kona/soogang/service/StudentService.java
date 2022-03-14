@@ -112,18 +112,17 @@ public class StudentService {
     public String lectureRegister(String lectureName,HttpSession session) {
         String email = (String) session.getAttribute("loginId");
 
-        //강의 테이블에서 강의명으로 코드 조회
-        Long lectureCode = lectureRepository.findByLectureName(lectureName).get(0).getLectureCode();
-
         //1. 수용인원과 추천여부 따져보기
         List<Lecture> lecture = lectureRepository.findByLectureName(lectureName);
         //최대 인원
         int maxPerson = lecture.get(0).getMaxPerson();
         System.out.println("@@@@@@ maxPerson:: "+ maxPerson);
         //강의명으로 현재 신청 인원수 파악
-        int registersCount = registerRepository.countRegistered(lectureName);
+        //강의 테이블에서 강의명으로 코드 조회
+        Long lectureCode = lecture.get(0).getLectureCode();
+        int registersCount = registerRepository.countRegistered(lectureCode);
         System.out.println("@@@@@@ registersCount:: " + registersCount);
-        //추천 여부
+        //현재 로그인한 학생의 추천 여부 확인
         String joinStatus = studentRepository.findById(email).get().getJoinStatus();
         System.out.println("joinStatus:: "+joinStatus);
 
@@ -136,14 +135,9 @@ public class StudentService {
         //2. 중복신청 체크
         RegisterId registerId = new RegisterId();
         registerId.setLectureCode(lectureCode);
-        registerId.setStudentName(email);
-        List<Register> RegisterForDuplicate = registerRepository.findByRegisterId(registerId);
+        registerId.setStudentEmail(email);
+        List<Register> registerForDuplicate = registerRepository.findByRegisterId(registerId);
 
-        if (!RegisterForDuplicate.isEmpty()){ //결과가 비어있냐?? 아니! => 결과가 있다는 뜻! 고로 중복
-            throw new IllegalStateException("INFO:: you have already registered to this lecture");
-        }
-
-        //3. 위에 두개 다 통과했다면, 수강 신청 가능
         Register register = new Register();
         register.setRegisterId(registerId);
         register.setCancelStatus("NO");
@@ -151,9 +145,41 @@ public class StudentService {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         register.setTimestamp(timestamp);
 
-        registerRepository.save(register);
+        //중복이지만, 신청을 취소했던 경우 재신청
+        if (!registerForDuplicate.isEmpty() && registerForDuplicate.get(0).getCancelStatus().equals("YES")){
+            registerRepository.save(register);
+            return '"'+lectureName+'"'+ " 강의를 다시 수강 신청 했습니다.";
+        }
 
+        //그냥 중복인 경우
+        if (!registerForDuplicate.isEmpty()){
+            throw new IllegalStateException("INFO:: you have already registered to this lecture");
+        }
+
+        //모든 경우에 해당하지 않는다면 정상적으로 수강 신청
+        registerRepository.save(register);
         String registerMent = '"'+lectureName+'"'+ " 강의를 수강 신청 했습니다.";
         return registerMent;
+    }
+
+    @LoginCheck
+    @Transactional
+    public String registerCancel(String lectureName, HttpSession session) {
+        String email = (String) session.getAttribute("loginId");
+
+        Long lectureCode = lectureRepository.findByLectureName(lectureName).get(0).getLectureCode();
+
+        RegisterId registerId = new RegisterId();
+        registerId.setLectureCode(lectureCode);
+        registerId.setStudentEmail(email);
+
+        if(registerRepository.findByRegisterId(registerId).get(0).getCancelStatus().equals("YES")){
+            return "이미 취소한 강의입니다.";
+        };
+
+        registerRepository.registerCancel(lectureCode, email);
+
+        String cancelMent = '"'+lectureName+'"'+ " 강의 수강을 취소했습니다.";
+        return cancelMent;
     }
 }

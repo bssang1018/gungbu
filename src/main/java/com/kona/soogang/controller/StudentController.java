@@ -45,7 +45,11 @@ public class StudentController {
     }
 
     //수강취소
-
+    @GetMapping(value = "/registerCancel/{lectureName}")
+    public String registerCancel(@PathVariable String lectureName, HttpSession session){
+        System.out.println("수강취소 파라미터 확인 :: " + lectureName);
+        return studentService.registerCancel(lectureName, session);
+    }
 
     //수강신청 조회
 
