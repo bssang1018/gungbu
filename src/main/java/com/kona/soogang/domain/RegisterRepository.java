@@ -23,4 +23,5 @@ public interface RegisterRepository extends JpaRepository<Register, RegisterId> 
     @Query(value = "SELECT * FROM register WHERE student_email=?1"
             , nativeQuery = true)
     List<Register> findByStudentEmail(String email);
+
 }

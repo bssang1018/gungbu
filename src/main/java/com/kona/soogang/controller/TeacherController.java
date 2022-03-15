@@ -5,19 +5,29 @@ import com.kona.soogang.dto.StudentDto;
 import com.kona.soogang.service.TeacherService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.apache.logging.log4j.message.LoggerNameAwareMessage;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
 
 @RequestMapping("/teacher")
 @RestController
 @RequiredArgsConstructor
-public class TeacherContorller {
+public class TeacherController {
 
     private final TeacherService teacherService;
-    private final HttpServletRequest httpServletRequest;
+
+    //폐강
+    @PostMapping(value = "/lectureClose", produces = "application/json; charset=UTF-8")
+    public String lectureClose(@RequestBody HashMap<String, Long> param){
+        System.out.println("폐강할 강의 코드:: " + param.get("lectureCode"));
+        return teacherService.lectureClose(param);
+    }
 
     //강사 가입
     @GetMapping(value = "/join/{id}/{pw}/{name}")

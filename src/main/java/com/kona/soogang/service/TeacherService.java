@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class TeacherService {
     private final TeacherRepository teacherRepository;
     private final StudentRepository studentRepository;
     private final LectureRepository lectureRepository;
+    private final RegisterRepository registerRepository;
 
     // 강사 회원가입
     @Transactional
@@ -138,6 +140,23 @@ public class TeacherService {
         List<Student> studentList = studentRepository.recommendedStudentList();
 
         return studentList.stream().map(StudentDto::new).collect(Collectors.toList());
+    }
+
+    public String lectureClose(HashMap<String, Long> param) {
+        Long lectureCode = param.get("lectureCode");
+        int countRegistered = registerRepository.countRegistered(lectureCode);
+
+        if (countRegistered > 2){ //3명 부터 폐강 불가능
+            throw new IllegalStateException("INFO:: you can't close the lecture");
+        }
+
+        if (lectureRepository.findById(lectureCode).get().getCloseStatus().equals("YES")){
+            throw new IllegalStateException("INFO:: already closed lecture");
+        }
+
+        lectureRepository.lectureClose(lectureCode);
+
+        return "폐강 했습니다.(강의코드: "+lectureCode+")";
     }
 }
 
