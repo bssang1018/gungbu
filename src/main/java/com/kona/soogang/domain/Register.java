@@ -1,18 +1,14 @@
 package com.kona.soogang.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Register {
 
     //복합키
@@ -25,5 +21,11 @@ public class Register {
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
 
+    @Builder
+    public Register(RegisterId registerId, String cancelStatus, Date timestamp){
+        this.registerId = registerId;
+        this.cancelStatus = cancelStatus;
+        this.timestamp = timestamp;
+    }
 
 }

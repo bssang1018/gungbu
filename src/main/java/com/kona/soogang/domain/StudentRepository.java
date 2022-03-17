@@ -19,7 +19,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
             , nativeQuery = true)
     void recommendUpdate(String joinStatus, String id, String email);
 
-    @Query(value="SELECT * FROM student WHERE join_status = 'BY'"
+    @Query(value="SELECT * FROM student WHERE join_status ='BY'"
             , nativeQuery = true)
     List<Student> recommendedStudentList();
 }

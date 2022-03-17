@@ -4,8 +4,10 @@ import com.kona.soogang.aop.LoginCheck;
 import com.kona.soogang.domain.Lecture;
 import com.kona.soogang.dto.LectureDto;
 import com.kona.soogang.service.CommonService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +15,15 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 public class CommonController {
 
+    //@RequiredArgsConstructor 사용하지 않고, 직접 생성자 명시
     private final CommonService commonService;
-    // 세션
     private final HttpServletRequest httpServletRequest;
+    public CommonController(CommonService commonService, HttpServletRequest httpServletRequest){
+        this.commonService = commonService;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     // 세션에서 아이디 가져오기
     public String currentId(){
@@ -44,10 +49,11 @@ public class CommonController {
     }
 
     //강의 조회
-    @LoginCheck
+    //Pageable 사용해보기
     @GetMapping(value = "/lectureList")
-    public List<LectureDto> lectureList(){
-        return commonService.lectureList();
+    @ResponseBody
+    public List<LectureDto> lectureList(Pageable pageable){
+        return commonService.lectureList(pageable);
     }
 
 

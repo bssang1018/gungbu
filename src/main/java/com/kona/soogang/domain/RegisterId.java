@@ -1,9 +1,6 @@
 package com.kona.soogang.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -12,7 +9,8 @@ import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Embeddable
 @NoArgsConstructor
 public class RegisterId implements Serializable {
@@ -23,6 +21,12 @@ public class RegisterId implements Serializable {
 
     @Column(name="student_email")
     private String studentEmail;
+
+    @Builder
+    public RegisterId(Long lectureCode, String studentEmail){
+        this.lectureCode = lectureCode;
+        this.studentEmail = studentEmail;
+    }
 
 }
 

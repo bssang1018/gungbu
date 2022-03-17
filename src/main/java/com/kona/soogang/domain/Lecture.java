@@ -5,10 +5,8 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Builder
-@Data
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Lecture {
 
     @Id
@@ -30,4 +28,12 @@ public class Lecture {
     @JoinColumn(name="teacher_id")
     public Teacher teacher;
 
+    @Builder
+    public Lecture(Teacher teacher, Long lectureCode, String lectureName, String closeStatus, int maxPerson){
+        this.teacher = teacher;
+        this.lectureCode = lectureCode;
+        this.lectureName = lectureName;
+        this.closeStatus = closeStatus;
+        this.maxPerson = maxPerson;
+    }
 }
