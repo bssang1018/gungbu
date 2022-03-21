@@ -72,7 +72,7 @@ public class StudentController {
     //수강신청
     @PostMapping(value = "/lectureRegister", produces = "application/json; charset=UTF-8")
     public String lectureRegister(@RequestBody RegisterDto registerDto) {
-        System.out.println("수강신청한 강의코드 :: " + registerDto.getLectureCode());
+        System.out.println("수강신청한 강의코드 :: " + registerDto.getLectureCode() + " / " + registerDto.getEmail());
         return studentService.lectureRegister(registerDto);
     }
 

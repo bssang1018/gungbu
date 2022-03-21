@@ -4,6 +4,7 @@ import com.kona.soogang.aop.LoginCheck;
 import com.kona.soogang.domain.*;
 import com.kona.soogang.dto.RegisterDto;
 import com.kona.soogang.dto.StudentDto;
+import com.kona.soogang.dto.TeacherDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,20 +83,20 @@ public class StudentService {
     @Transactional(rollbackFor = Exception.class)
     public String studentJoin(StudentDto studentDto) {
 
-        String email = studentDto.getEmail();
         //이메일 중복 체크
-        validateDuplicateCheck(email);
+        validateDuplicateCheck(studentDto.getEmail());
         //강사의 추천을 확인
-        String recommendResult = recommendCheck(email);
+        String recommendResult = recommendCheck(studentDto.getEmail());
         System.out.println("추천여부 확인 결과 :: " + recommendResult);//NO 또는 BY
 
+//        if (recommendResult.equals("BY")){
+//            Student studentA = studentRepository.findById(studentDto.getId()).get();
+//            studentA.joinStatusUpdate();
+//        }
         studentDto.setJoinStatus(recommendResult);
+        studentRepository.save(studentDto.toEntity());
 
-        Student student = studentDto.toEntity();
-        studentRepository.save(student);
-
-        String joinMent = email + "님! 가입이 되었습니다.";
-        return joinMent;
+        return studentDto.getEmail()+"님! 가입이 되었습니다.";
     }
 
     //이메일 중복 체크
@@ -110,15 +111,11 @@ public class StudentService {
     //학생 추천 여부 체크
     public String recommendCheck(String email) {
 
-        Optional<Student> studentOptional = studentRepository.findById(email);
-
-        if (!studentOptional.isPresent()) { //중복없으면 따질것도 없이 신규 가입
-
+        if (!studentRepository.findById(email).isPresent()) { //중복없으면 따질것도 없이 신규 가입
             return "NO";
         }
 
-        Student student = studentOptional.get();
-
+        Student student = studentRepository.findById(email).get();
         if (student.getEmail() == email && student.getJoinStatus() == "BN") { //BN은 사전에 추천받았지만, 미가입상태
             return "BY"; //가입 상태로 업데이트
         } else {
@@ -229,21 +226,18 @@ public class StudentService {
     //수강신청
     @Transactional(rollbackFor = Exception.class)
     public String lectureRegister(RegisterDto registerDto) {
-        String email = registerDto.getStudentEmail();
-        Long lectureCode = registerDto.getLectureCode();
 
         //1. 수용인원과 추천여부 따져보기
-        List<Lecture> lecture = lectureRepository.findByLectureName(lectureCode);
+        Lecture lecture = lectureRepository.findById(registerDto.getLectureCode()).get();
+
         //최대 인원
-        int maxPerson = lecture.get(0).getMaxPerson();
+        int maxPerson = lecture.getMaxPerson();
         System.out.println("@@@@@@ maxPerson:: " + maxPerson);
         //강의명으로 현재 신청 인원수 파악
-        //강의 테이블에서 강의명으로 코드 조회
-        lectureCode = lecture.get(0).getLectureCode();
-        int registersCount = registerRepository.countRegistered(lectureCode);
+        int registersCount = registerRepository.countRegistered(registerDto.getLectureCode());
         System.out.println("@@@@@@ registersCount:: " + registersCount);
         //현재 로그인한 학생의 추천 여부 확인
-        String joinStatus = studentRepository.findById(email).get().getJoinStatus();
+        String joinStatus = studentRepository.findById(registerDto.getEmail()).get().getJoinStatus();
         System.out.println("joinStatus:: " + joinStatus);
 
         if (registersCount >= maxPerson && joinStatus.equals("NO")) { //인원이 맥스 이상이고, 추천학생이 아닌 경우 팅궈 => 둘다 만족해야 팅궈
@@ -254,8 +248,8 @@ public class StudentService {
 
         //2. 중복신청 체크
         RegisterId registerId = new RegisterId();
-        registerId.setLectureCode(lectureCode);
-        registerId.setStudentEmail(email);
+        registerId.setLectureCode(registerDto.getLectureCode());
+        registerId.setEmail(registerDto.getEmail());
         List<Register> registerForDuplicate = registerRepository.findByRegisterId(registerId);
 
         Register register = new Register();
@@ -265,10 +259,13 @@ public class StudentService {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         register.setTimestamp(timestamp);
 
+        //강의명을 가져오자
+        String lectureName = lectureRepository.findById(registerDto.getLectureCode()).get().getLectureName();
+
         //중복이지만, 신청을 취소했던 경우 재신청
         if (!registerForDuplicate.isEmpty() && registerForDuplicate.get(0).getCancelStatus().equals("YES")) {
             registerRepository.save(register);
-            return '"' + lectureCode + '"' + " 강의를 다시 수강 신청 했습니다.";
+            return '"' + lectureName + '"' + " 강의를 다시 수강 신청 했습니다.";
         }
 
         //그냥 중복인 경우
@@ -278,7 +275,7 @@ public class StudentService {
 
         //모든 경우에 해당하지 않는다면 정상적으로 수강 신청
         registerRepository.save(register);
-        String registerMent = '"' + lectureCode + '"' + " 강의를 수강 신청 했습니다.";
+        String registerMent = '"' + lectureName + '"' + " 강의를 수강 신청 했습니다.";
         return registerMent;
     }
 
@@ -305,12 +302,12 @@ public class StudentService {
 
     @Transactional(rollbackFor = Exception.class)
     public String registerCancel(RegisterDto registerDto) {
-        String email = registerDto.getStudentEmail();
+        String email = registerDto.getEmail();
         Long lectureCode = registerDto.getLectureCode();
 
         RegisterId registerId = new RegisterId();
         registerId.setLectureCode(lectureCode);
-        registerId.setStudentEmail(email);
+        registerId.setEmail(email);
         if (registerRepository.findByRegisterId(registerId).get(0).getCancelStatus().equals("YES")) {
             return "이미 취소한 강의입니다.";
         }

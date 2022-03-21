@@ -1,6 +1,7 @@
 package com.kona.soogang.domain;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 public class Student {
 
     @Id
+    @GeneratedValue
     @Column(name="student_email")
     private String email;
 
@@ -29,8 +31,8 @@ public class Student {
     //NO: 추천받지 못함
 
     //연관관계 매핑
-    @ManyToOne
-    @JoinColumn(name="teacher_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="teacher_id", nullable = true)
     private Teacher teacher;
 
     @Builder
@@ -40,5 +42,9 @@ public class Student {
         this.pw = pw;
         this.name = name;
         this.joinStatus = joinStatus;
+    }
+
+    public void joinStatusUpdate(){
+        this.joinStatus = "BY";
     }
 }

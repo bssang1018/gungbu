@@ -11,15 +11,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class Register {
 
-    //복합키
-    @EmbeddedId
-    private RegisterId registerId;
-
     @Column(name="cancel_status")
     private String cancelStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
+
+    //복합키
+    @EmbeddedId
+    private RegisterId registerId;
 
     @Builder
     public Register(RegisterId registerId, String cancelStatus, Date timestamp){

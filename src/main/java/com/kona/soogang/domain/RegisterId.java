@@ -20,12 +20,12 @@ public class RegisterId implements Serializable {
     private Long lectureCode;
 
     @Column(name="student_email")
-    private String studentEmail;
+    private String email;
 
     @Builder
-    public RegisterId(Long lectureCode, String studentEmail){
+    public RegisterId(Long lectureCode, String email){
         this.lectureCode = lectureCode;
-        this.studentEmail = studentEmail;
+        this.email = email;
     }
 
 }

@@ -15,31 +15,30 @@ public class RegisterDto {
     private Date timestamp;
 
     private Long lectureCode;
-    private String studentEmail;
+    private String email;
 
     @Builder
-    public RegisterDto(String cancelStatus, Date timestamp, Long lectureCode, String studentEmail){
+    public RegisterDto(String cancelStatus, Date timestamp, Long lectureCode, String email){
         this.cancelStatus = cancelStatus;
         this.timestamp = timestamp;
 
         this.lectureCode = lectureCode;
-        this.studentEmail = studentEmail;
+        this.email = email;
     }
 
-    //강의 등록 dto 수정하기
     public RegisterDto(Register register){
         this.cancelStatus = register.getCancelStatus();
         this.timestamp = register.getTimestamp();
 
         this.lectureCode = register.getRegisterId().getLectureCode();
-        this.studentEmail = register.getRegisterId().getStudentEmail();
+        this.email = register.getRegisterId().getEmail();
     }
 
     public Register toEntity(){
         return Register.builder()
                 .cancelStatus(cancelStatus)
                 .timestamp(timestamp)
-                .registerId(RegisterId.builder().lectureCode(lectureCode).studentEmail(studentEmail).build())
+                .registerId(RegisterId.builder().lectureCode(lectureCode).email(email).build())
                 .build();
     }
 
