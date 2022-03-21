@@ -20,8 +20,15 @@ public class CommonService {
         this.lectureRepository = lectureRepository;
     }
 
+    //강의리스트 조회
     public List<LectureDto> lectureList(Pageable pageable) {
         Page<Lecture> lectureList = lectureRepository.findAll(pageable);
+
+        if (lectureList.isEmpty()){
+            //조회결과가 존재하지 않는다면
+            throw new IllegalStateException();
+        }
+
         // 스트림 사용해 보기
         return lectureList.stream().map(LectureDto::new).collect(Collectors.toList());
     }

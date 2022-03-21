@@ -1,10 +1,10 @@
 package com.kona.soogang.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -12,21 +12,21 @@ import java.util.List;
 public class Teacher {
 
     @Id
-    @Column(name="teacher_id")
-    @GeneratedValue
-    private String id;
+    @Column(name="teacher_num")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long teacherNum;
 
-    @Column(name="teacher_pw")
-    private String pw;
+    @Column(name="teacher_id")
+    private String teacherId;
 
     @Column(name="teacher_name")
-    private String name;
+    private String teacherName;
 
     @Builder
-    public Teacher(String id, String pw, String name){
-        this.id = id;
-        this.pw = pw;
-        this.name = name;
+    public Teacher(Long teacherNum, String teacherId, String teacherName){
+        this.teacherNum = teacherNum;
+        this.teacherId = teacherId;
+        this.teacherName = teacherName;
     }
 
 }

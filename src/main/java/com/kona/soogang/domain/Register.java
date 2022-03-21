@@ -1,9 +1,11 @@
 package com.kona.soogang.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -11,21 +13,31 @@ import java.util.Date;
 @NoArgsConstructor
 public class Register {
 
+    @Id
+    @Column(name = "register_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long registerId;
+
     @Column(name="cancel_status")
     private String cancelStatus;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lectureCode")
+    private Lecture lecture;
 
-    //복합키
-    @EmbeddedId
-    private RegisterId registerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "studentNum")
+    private Student student;
 
     @Builder
-    public Register(RegisterId registerId, String cancelStatus, Date timestamp){
+    public Register(Long registerId, String cancelStatus, Lecture lecture, Student student){
         this.registerId = registerId;
         this.cancelStatus = cancelStatus;
-        this.timestamp = timestamp;
+        this.lecture = lecture;
+        this.student = student;
     }
 
+    public void cancelUpdate(String status){
+        this.cancelStatus = status;
+    }
 }

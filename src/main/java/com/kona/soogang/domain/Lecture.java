@@ -1,6 +1,8 @@
 package com.kona.soogang.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -24,16 +26,20 @@ public class Lecture {
     private int maxPerson;
 
     //연관관계 매핑
-    @ManyToOne
-    @JoinColumn(name="teacher_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="teacher_num")
     public Teacher teacher;
 
     @Builder
-    public Lecture(Teacher teacher, Long lectureCode, String lectureName, String closeStatus, int maxPerson){
-        this.teacher = teacher;
+    public Lecture(Long lectureCode, String lectureName, String closeStatus, int maxPerson, Teacher teacher){
         this.lectureCode = lectureCode;
         this.lectureName = lectureName;
         this.closeStatus = closeStatus;
         this.maxPerson = maxPerson;
+        this.teacher = teacher;
+    }
+
+    public void setCloseStatus(String closeStatus){
+        this.closeStatus = closeStatus;
     }
 }

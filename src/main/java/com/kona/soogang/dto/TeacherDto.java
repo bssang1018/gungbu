@@ -11,28 +11,28 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TeacherDto {
 
-    private String id;
-    private String pw;
-    private String name;
+    private Long teacherNum;
+    private String teacherId;
+    private String teacherName;
 
     @Builder
-    public TeacherDto(String id, String pw, String name){
-        this.id = id;
-        this.pw = pw;
-        this.name = name;
+    public TeacherDto(Long teacherNum, String teacherId, String teacherName){
+        this.teacherNum = teacherNum;
+        this.teacherId = teacherId;
+        this.teacherName = teacherName;
     }
 
     public TeacherDto(Teacher teacher){
-        id = teacher.getId();
-        pw = teacher.getPw();
-        name = teacher.getName();
+        this.teacherNum = teacher.getTeacherNum();
+        this.teacherId = teacher.getTeacherId();
+        this.teacherName = teacher.getTeacherName();
     }
 
     public Teacher toEntity(){
         return Teacher.builder()
-                .id(id)
-                .pw(pw)
-                .name(name)
+                .teacherNum(teacherNum)
+                .teacherId(teacherId)
+                .teacherName(teacherName)
                 .build();
     }
 

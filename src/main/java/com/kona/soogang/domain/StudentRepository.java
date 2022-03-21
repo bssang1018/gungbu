@@ -1,25 +1,14 @@
 package com.kona.soogang.domain;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface StudentRepository extends JpaRepository<Student, String> {
+public interface StudentRepository extends JpaRepository<Student, Long> {
 
-    List<Student> findByEmailAndPw(String email, String pw);
+    Optional<Student> findByEmail(String email);
 
-    List<Student> findByEmail(String email);
-
-    @Modifying
-    @Query(value="UPDATE student SET join_status=?1, teacher_id=?2 WHERE student_email=?3"
-            , nativeQuery = true)
-    void recommendUpdate(String joinStatus, String id, String email);
-
-    @Query(value="SELECT * FROM student WHERE join_status ='BY'"
-            , nativeQuery = true)
-    List<Student> recommendedStudentList();
+    Page<Student> findAllByJoinStatusIn(String[] arr, Pageable pageable);
 }

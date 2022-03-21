@@ -1,45 +1,47 @@
 package com.kona.soogang.dto;
 
+import com.kona.soogang.domain.Lecture;
 import com.kona.soogang.domain.Register;
-import com.kona.soogang.domain.RegisterId;
-import lombok.*;
-
-import java.util.Date;
+import com.kona.soogang.domain.Student;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class RegisterDto {
 
+    private Long registerId;
     private String cancelStatus;
-    private Date timestamp;
-
     private Long lectureCode;
+    private Long studentNum;
+
+    private String lectureName;
     private String email;
 
     @Builder
-    public RegisterDto(String cancelStatus, Date timestamp, Long lectureCode, String email){
+    public RegisterDto(Long registerId, String cancelStatus, Long lectureCode, Long studentNum){
+        this.registerId = registerId;
         this.cancelStatus = cancelStatus;
-        this.timestamp = timestamp;
-
         this.lectureCode = lectureCode;
-        this.email = email;
+        this.studentNum = studentNum;
     }
 
     public RegisterDto(Register register){
+        this.registerId = register.getRegisterId();
         this.cancelStatus = register.getCancelStatus();
-        this.timestamp = register.getTimestamp();
-
-        this.lectureCode = register.getRegisterId().getLectureCode();
-        this.email = register.getRegisterId().getEmail();
+        this.lectureCode = register.getLecture().getLectureCode();
+        this.studentNum = register.getStudent().getStudentNum();
     }
 
     public Register toEntity(){
         return Register.builder()
+                .registerId(registerId)
                 .cancelStatus(cancelStatus)
-                .timestamp(timestamp)
-                .registerId(RegisterId.builder().lectureCode(lectureCode).email(email).build())
+                .lecture(Lecture.builder().lectureCode(lectureCode).build())
+                .student(Student.builder().studentNum(studentNum).build())
                 .build();
     }
-
 }

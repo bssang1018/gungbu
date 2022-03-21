@@ -12,37 +12,37 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StudentDto {
 
+    private Long studentNum;
     private String email;
-    private String pw;
     private String name;
     private String joinStatus;
-    private String id;
+    private Long teacherNum;
 
     @Builder
-    public StudentDto(String email, String pw, String name, String joinStatus, String id){
+    public StudentDto(Long studentNum, String email, String name, String joinStatus, Long teacherNum){
+        this.studentNum = studentNum;
         this.email = email;
-        this.pw = pw;
         this.name = name;
         this.joinStatus = joinStatus;
-        this.id = id;
+        this.teacherNum = teacherNum;
     }
 
     public StudentDto(Student student){
+        this.studentNum = student.getStudentNum();
         this.email = student.getEmail();
-        this.pw = student.getPw();
         this.name = student.getName();
-        this.joinStatus = getJoinStatus();
-        this.id = student.getTeacher().getId();
+        this.joinStatus = student.getJoinStatus();
+        this.teacherNum = student.getTeacher().getTeacherNum();
     }
 
-    //Dto를 Entity로 바꿔서 DB에 삽입하기 위함.
+    //DTO를 Entity로 변환하자!
     public Student toEntity(){
         return Student.builder()
+                .studentNum(studentNum)
                 .email(email)
-                .pw(pw)
                 .name(name)
                 .joinStatus(joinStatus)
-                .teacher(Teacher.builder().id(id).build())
+                .teacher(Teacher.builder().teacherNum(teacherNum).build())
                 .build();
     }
 

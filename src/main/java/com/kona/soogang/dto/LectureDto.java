@@ -2,7 +2,10 @@ package com.kona.soogang.dto;
 
 import com.kona.soogang.domain.Lecture;
 import com.kona.soogang.domain.Teacher;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -13,18 +16,16 @@ public class LectureDto {
     private String lectureName;
     private String closeStatus;
     private int maxPerson;
-
-    private String id;
+    private Long teacherNum;
 
 
     @Builder
-    public LectureDto(Long lectureCode, String lectureName, int maxPerson, String closeStatus, String id){
+    public LectureDto(Long lectureCode, String lectureName, int maxPerson, String closeStatus, Long teacherNum){
         this.lectureCode = lectureCode;
         this.lectureName = lectureName;
         this.maxPerson = maxPerson;
         this.closeStatus = closeStatus;
-
-        this.id = id;
+        this.teacherNum = teacherNum;
     }
 
     public LectureDto(Lecture lecture){
@@ -32,8 +33,7 @@ public class LectureDto {
         this.lectureName = lecture.getLectureName();
         this.maxPerson = lecture.getMaxPerson();
         this.closeStatus = lecture.getCloseStatus();
-
-        this.id = lecture.getTeacher().getId();
+        this.teacherNum = lecture.getTeacher().getTeacherNum();
     }
 
     public Lecture toEntity(){
@@ -42,7 +42,7 @@ public class LectureDto {
                     .lectureName(lectureName)
                     .maxPerson(maxPerson)
                     .closeStatus(closeStatus)
-                    .teacher(Teacher.builder().id(id).build())
+                    .teacher(Teacher.builder().teacherNum(teacherNum).build())
                     .build();
     }
 }
