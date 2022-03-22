@@ -43,7 +43,6 @@ public class Student {
         this.teacher = teacher;
     }
 
-
     public void studentUpdate(String name,String joinStatus){
         this.name = name;
         this.joinStatus = joinStatus;

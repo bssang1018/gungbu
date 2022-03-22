@@ -18,8 +18,6 @@ public class RegisterDto {
     private Long lectureCode;
     private Long studentNum;
 
-    private String lectureName;
-    private String email;
 
     @Builder
     public RegisterDto(Long registerId, String cancelStatus, Long lectureCode, Long studentNum){

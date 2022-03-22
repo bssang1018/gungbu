@@ -5,6 +5,8 @@ import com.kona.soogang.domain.LectureRepository;
 import com.kona.soogang.dto.LectureDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,20 +18,29 @@ import java.util.stream.Collectors;
 public class CommonService {
 
     private final LectureRepository lectureRepository;
+
     public CommonService(LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
     }
 
     //강의리스트 조회
-    public List<LectureDto> lectureList(Pageable pageable) {
+    public ResponseEntity<List<LectureDto>> lectureList(Pageable pageable) throws IllegalStateException {
         Page<Lecture> lectureList = lectureRepository.findAll(pageable);
 
         if (lectureList.isEmpty()){
-            //조회결과가 존재하지 않는다면
             throw new IllegalStateException();
         }
 
-        // 스트림 사용해 보기
-        return lectureList.stream().map(LectureDto::new).collect(Collectors.toList());
+        List<LectureDto> lectureDtos = lectureList.getContent().stream()
+                .map(dto -> LectureDto.builder()
+                        .lectureCode(dto.getLectureCode())
+                        .lectureName(dto.getLectureName())
+                        .closeStatus(dto.getCloseStatus())
+                        .maxPerson(dto.getMaxPerson())
+                        .teacherNum(dto.getTeacher().getTeacherNum())
+                        .build()
+                ).collect(Collectors.toList());
+        return new ResponseEntity<>(lectureDtos, HttpStatus.OK);
+
     }
 }
