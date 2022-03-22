@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class TestExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<String> duplicate(){
-        return new ResponseEntity<>("중복된 데이터가 검색되었습니다. 다른 값을 입력해 주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(value = IllegalArgumentException.class)
+//    public ResponseEntity<String> duplicate(){
+//        return new ResponseEntity<>("중복된 데이터가 검색되었습니다. 다른 값을 입력해 주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     @ExceptionHandler(value = IllegalStateException.class)
     public ResponseEntity<String> noResult(){
