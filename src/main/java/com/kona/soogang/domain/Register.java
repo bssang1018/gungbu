@@ -22,11 +22,11 @@ public class Register {
     private String cancelStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lectureCode")
+    @JoinColumn(name = "lecture_code", foreignKey = @ForeignKey, nullable = true)
     private Lecture lecture;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studentNum")
+    @JoinColumn(name = "student_num", foreignKey = @ForeignKey, nullable = true)
     private Student student;
 
     @Builder

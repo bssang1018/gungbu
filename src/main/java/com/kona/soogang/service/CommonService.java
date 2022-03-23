@@ -3,6 +3,8 @@ package com.kona.soogang.service;
 import com.kona.soogang.domain.Lecture;
 import com.kona.soogang.domain.LectureRepository;
 import com.kona.soogang.dto.LectureDto;
+import com.kona.soogang.exception.TestException;
+import com.kona.soogang.exception.TestHttpResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -28,10 +30,12 @@ public class CommonService {
         this.lectureRepository = lectureRepository;
     }
 
-//    //강의리스트 조회
-//    public ResponseEntity<List<Lecture>> lectureList(String status,Pageable pageable){
-//        Page<Lecture> lecturePage = lectureRepository.findAllByCloseStatus(status, pageable);
-//        lecturePage.map()
-//        return new ResponseEntity<>(lecturePage,HttpStatus.OK);
-//    }
+    public ResponseEntity<Page<LectureDto>> lectureList(int page, int size, String sort) {
+        if(sort==null || sort.trim().isEmpty() || Integer.valueOf(page)==null || Integer.valueOf(size)==null){
+            throw new IllegalStateException();
+        }
+        Page<Lecture> lecturePage = lectureRepository.findAll(PageRequest.of(page-1, size, Sort.Direction.ASC, sort));
+        Page<LectureDto> lectureDtos = lecturePage.map(LectureDto::new);
+        return new ResponseEntity<>(lectureDtos, HttpStatus.OK);
+    }
 }

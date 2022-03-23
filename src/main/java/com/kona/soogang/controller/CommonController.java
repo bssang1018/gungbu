@@ -3,6 +3,8 @@ package com.kona.soogang.controller;
 import com.kona.soogang.domain.Lecture;
 import com.kona.soogang.domain.LectureRepository;
 import com.kona.soogang.dto.LectureDto;
+import com.kona.soogang.exception.TestException;
+import com.kona.soogang.exception.TestHttpResponseCode;
 import com.kona.soogang.service.CommonService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -40,6 +42,7 @@ public class CommonController {
     @GetMapping(value = "/")
     public String firstPage() {
         logger.info("메인 페이지 요청");
+        //throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         return "안녕하세요! 만나서 반갑습니다.";
     }
 
@@ -48,9 +51,7 @@ public class CommonController {
     //폐강 아닌 강의만 조회, 또는 폐강 강의 포함 조회
     @GetMapping(value = "/lectureList")
     public ResponseEntity<Page<LectureDto>> lectureList(int page, int size, String sort) {
-        logger.info("강의 리스트 조회:: "+page+"/"+size);
-        Page<Lecture> lecturePage = lectureRepository.findAll(PageRequest.of(page-1, size, Sort.Direction.ASC, sort));
-        Page<LectureDto> lectureDtos = lecturePage.map(LectureDto::new);
-        return new ResponseEntity<>(lectureDtos, HttpStatus.OK);
+        logger.info("강의 리스트 조회:: "+page+"/"+size+"/"+sort);
+        return commonService.lectureList(page, size, sort);
     }
 }

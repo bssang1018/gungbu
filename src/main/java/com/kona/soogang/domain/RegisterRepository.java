@@ -1,6 +1,7 @@
 package com.kona.soogang.domain;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,7 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 
     Optional<Register> findByLecture_LectureCodeAndStudent_StudentNum(Long lectureCode, Long studentNum);
 
-    Page<Register> findAllByStudent_StudentNum(Long studentNum, Pageable pageable);
+    Page<Register> findAllByStudent_StudentNumIs(Long studentNum, Pageable pageable);
 
+    Page<Register> findAllByLecture_LectureCodeAndCancelStatus(Long lectureCode, String no, Pageable pageable);
 }

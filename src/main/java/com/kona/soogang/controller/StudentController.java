@@ -4,6 +4,7 @@ import com.kona.soogang.dto.*;
 import com.kona.soogang.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,13 +46,14 @@ public class StudentController {
 
     //수강신청 조회
     @GetMapping(value = "/registerList")
-    public List<RegisterResponse> registerList(@RequestParam String email, Pageable pageable) {
-        return studentService.registerList(email, pageable);
+    public ResponseEntity<Page<RegisterDto>> registerList(@RequestParam String email, int page, int size, String sort) {
+        logger.info("수강 신청 리스트 조회:: "+email+"/"+page+"/"+size+"/");
+        return studentService.registerList(email,page,size,sort);
     }
 
     //나를 추천한 강사의 이름 확인
-    @GetMapping(value = "/recommendedMe/{email}")
-    public String recommendedMe(@PathVariable String email) {
+    @GetMapping(value = "/recommendedMe/")
+    public ResponseEntity<String> recommendedMe(@RequestParam String email) {
         logger.info("추천 강사를 확인할 이메일:: " + email);
         return studentService.recommendedMe(email);
     }

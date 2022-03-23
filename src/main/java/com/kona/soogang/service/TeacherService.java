@@ -2,8 +2,12 @@ package com.kona.soogang.service;
 
 import com.kona.soogang.domain.*;
 import com.kona.soogang.dto.*;
+import com.kona.soogang.exception.TestException;
+import com.kona.soogang.exception.TestHttpResponseCode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,9 +36,13 @@ public class TeacherService {
     // 강사 회원가입
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<TeacherDto> teacherJoin(TeacherReq teacherReq) {
+        if (teacherReq.getTeacherId()==null || teacherReq.getTeacherId().trim().isEmpty() ||
+                teacherReq.getTeacherName()==null || teacherReq.getTeacherName().trim().isEmpty()){
+            throw new IllegalStateException();
+        }
 
         if (teacherReq.getTeacherId() == "" || teacherReq.getTeacherName() == ""){
-            throw new NullPointerException();
+            throw new IllegalStateException();
         }
         //id 중복 검사
         validateDuplicate(teacherReq.getTeacherId());
@@ -55,19 +63,23 @@ public class TeacherService {
     private void validateDuplicate(String teacherId) {
         Optional<Teacher> duplicateResult = teacherRepository.findByTeacherId(teacherId);
         if (duplicateResult.isPresent()) { //true면 중복
-            throw new IllegalArgumentException();
+            throw new TestException(TestHttpResponseCode.IDOREMAIL_DUPLICATE);
         }
     }
 
     //학생 추천
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<StudentDto> recommend(RecommendReq recommendReq) {
+        if (recommendReq.getTeacherId()==null || recommendReq.getTeacherId().trim().isEmpty() ||
+                recommendReq.getEmail()==null || recommendReq.getEmail().trim().isEmpty()){
+            throw new IllegalStateException();
+        }
 
         Optional<Student> student = studentRepository.findByEmail(recommendReq.getEmail());
         Optional<Teacher> teacher = teacherRepository.findByTeacherId(recommendReq.getTeacherId());
 
         if (!teacher.isPresent()){
-            throw new IllegalStateException();
+            throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
 
         if (!student.isPresent()){
@@ -87,7 +99,7 @@ public class TeacherService {
         }
         //이미 등록되어 있는 학생이고, 다른 강사의 추천을 이미 받은 경우(BN이나 AY인 상태)
         if(student.get().getJoinStatus().equals("BN") || student.get().getJoinStatus().equals("AY")){
-            throw new IllegalArgumentException();
+            throw new TestException(TestHttpResponseCode.DUPLICATE_REQUEST);
         }else{
             //BY도 아니고, AY도 아닌 NO인 상태인 경우
             //해당 컬럼을 업데이트
@@ -106,13 +118,21 @@ public class TeacherService {
     //강의 등록
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<LectureDto> lectureInsert(LectureReq lectureReq) {
+        if (lectureReq.getLectureName()==null || lectureReq.getLectureName().trim().isEmpty() ||
+            lectureReq.getTeacherId()==null || lectureReq.getTeacherId().trim().isEmpty()){
+            throw new IllegalStateException();
+        }
+
+        if(lectureReq.getMaxPerson() <= 0){
+            throw new TestException(TestHttpResponseCode.PERSON_ISSUE);
+        }
 
         if (lectureReq.getMaxPerson() > 100) {
-            throw new ClassCastException();
+            throw new TestException(TestHttpResponseCode.PERSON_ISSUE);
         }
         Optional<Teacher> teacher = teacherRepository.findByTeacherId(lectureReq.getTeacherId());
         if (!teacher.isPresent()){
-            throw new IllegalStateException();
+            throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
         validateDuplicateLecture(lectureReq.getLectureName());
 
@@ -135,25 +155,28 @@ public class TeacherService {
         Optional<Lecture> LectureDuplicateResult = lectureRepository.findByLectureName(lectureName);
         //같은 이름의 강의는 등록할 수 없다
         if (LectureDuplicateResult.isPresent()) {
-            throw new IllegalArgumentException();
+            throw new TestException(TestHttpResponseCode.DUPLICATE_REQUEST);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<LectureDto> lectureClose(CloseReq closeReq) {
+        if (closeReq.getLectureName()==null||closeReq.getLectureName().trim().isEmpty()){
+            throw new IllegalStateException();
+        }
         Optional<Lecture> lecture = lectureRepository.findByLectureName(closeReq.getLectureName());
         if (!lecture.isPresent()){
             //return "해당 강의를 찾을 수 없습니다. 강의명을 확인해 주세요";
-            throw new IllegalStateException();
+            throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
 
         Long lectureCode = lecture.get().getLectureCode();
         int countRegistered = registerRepository.findAllByLectureCode(lectureCode);
         if (countRegistered > 2) { //3명 부터 폐강 불가능
-            throw new ClassCastException();
+            throw new TestException(TestHttpResponseCode.CANT_CLOSE);
         }
         if (lecture.get().getCloseStatus().equals("YES")) {
-            throw new IllegalArgumentException();
+            throw new TestException(TestHttpResponseCode.DUPLICATE_REQUEST);
         }
         
         //폐강 상태만 업데이트 처리
@@ -168,15 +191,17 @@ public class TeacherService {
     }
 
     //추천된 학생 조회
-    public List<StudentDto> recommendedStudentList(Pageable pageable) {
-        String[] arr = {"BY","BN"};
-        Page<Student> studentList = studentRepository.findAllByJoinStatusIn(arr, pageable);
-
-        if(studentList.isEmpty()){
+    public ResponseEntity<Page<StudentDto>> recommendedStudentList(int page, int size, String sort) {
+        if(sort==null || sort.trim().isEmpty() || Integer.valueOf(page)==null || Integer.valueOf(size)==null){
             throw new IllegalStateException();
         }
 
-        return studentList.stream().map(StudentDto::new).collect(Collectors.toList());
+        Page<Student> studentList = studentRepository.findAllByJoinStatusNot("NO", PageRequest.of(page-1, size, Sort.Direction.ASC, sort));
+        if(studentList.isEmpty()){
+            throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
+        }
+        Page<StudentDto> studentDtos = studentList.map(StudentDto::new);
+        return new ResponseEntity<>(studentDtos,HttpStatus.OK);
     }
 }
 

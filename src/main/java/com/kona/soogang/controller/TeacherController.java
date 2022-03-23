@@ -4,6 +4,7 @@ import com.kona.soogang.dto.*;
 import com.kona.soogang.service.TeacherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,9 +52,9 @@ public class TeacherController {
 
     //강사의 추천으로 등록한 회원의 정보
     @GetMapping(value = "/recommendedStudentList")
-    public List<StudentDto> recommendedStudentList(Pageable pageable) {
+    public ResponseEntity<Page<StudentDto>> recommendedStudentList(int page, int size, String sort) {
         logger.info("강사의 추천을 받은 학생 리스트 조회");
-        return teacherService.recommendedStudentList(pageable);
+        return teacherService.recommendedStudentList(page,size,sort);
     }
 
 }

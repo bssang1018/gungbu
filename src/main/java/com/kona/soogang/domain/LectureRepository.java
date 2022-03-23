@@ -19,5 +19,4 @@ public interface LectureRepository extends JpaRepository<Lecture, Long> {
             , nativeQuery = true)
     void lectureClose(Long lectureCode);
 
-    Page<Lecture> findByCloseStatusIs(String status, PageRequest lectureName);
 }
