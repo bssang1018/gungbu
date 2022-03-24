@@ -6,16 +6,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.BindException;
+import javax.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class TestExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
+
+    //사용됨 이메일 형식이 아닌경우, 공백, null
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<String> dataVali(){
+        return new ResponseEntity<>("데이터를 올바르게 입력해 주세요.", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 
     //커스텀 예외
     @ExceptionHandler({TestException.class})
@@ -23,10 +29,10 @@ public class TestExceptionHandler {
         return new ResponseEntity(e.getTestHttpResponseCode().getMessage(),e.getTestHttpResponseCode().getHttpStatus());
     }
 
-    //공백입력 예외
+    //공백입력 예외 (사용됨)
     @ExceptionHandler(value = IllegalStateException.class)
     public ResponseEntity<String> illegalState(){
-        return new ResponseEntity<>("입력값이 잘못됐습니다. (공백은 입력할 수 없습니다)", HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>("입력값이 잘못됐습니다.", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(value = NullPointerException.class)
@@ -34,26 +40,17 @@ public class TestExceptionHandler {
         return new ResponseEntity<>("필요한 데이터를 모두 입력해 주세요.", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    //사용됨
     @ExceptionHandler(value = JsonParseException.class)
     public ResponseEntity<String> parseEx(){
         return new ResponseEntity<>("알맞은 형식으로 데이터를 입력해 주세요.", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    //사용됨 엔티티 컬럼명 틀린경우
     @ExceptionHandler(value = PropertyReferenceException.class)
     public ResponseEntity<String> sortEx(){
         return new ResponseEntity<>("정렬할 컬럼의 이름을 정확하게 입력해 주세요.", HttpStatus.UNPROCESSABLE_ENTITY);
     }
-
-
-//    @ExceptionHandler(value = IllegalArgumentException.class)
-//    public ResponseEntity<String> duplicate(){
-//        return new ResponseEntity<>("중복된 데이터가 검색되었습니다. 다른 값을 입력해 주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-
-//    @ExceptionHandler(value = ClassCastException.class)
-//    public ResponseEntity<String> maxIssue(){
-//        return new ResponseEntity<>("인원이 초과했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
 
 
 

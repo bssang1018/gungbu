@@ -31,7 +31,7 @@ public class Student {
 
     //연관관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="teacher_num", foreignKey = @ForeignKey, nullable = true)
+    @JoinColumn(name="teacher_num")
     private Teacher teacher;
 
     @Builder

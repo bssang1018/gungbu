@@ -31,10 +31,7 @@ public class CommonService {
     }
 
     public ResponseEntity<Page<LectureDto>> lectureList(int page, int size, String sort) {
-        if(sort==null || sort.trim().isEmpty() || Integer.valueOf(page)==null || Integer.valueOf(size)==null){
-            throw new IllegalStateException();
-        }
-        Page<Lecture> lecturePage = lectureRepository.findAll(PageRequest.of(page-1, size, Sort.Direction.ASC, sort));
+        Page<Lecture> lecturePage = lectureRepository.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
         Page<LectureDto> lectureDtos = lecturePage.map(LectureDto::new);
         return new ResponseEntity<>(lectureDtos, HttpStatus.OK);
     }

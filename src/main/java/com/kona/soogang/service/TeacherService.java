@@ -118,18 +118,13 @@ public class TeacherService {
     //강의 등록
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<LectureDto> lectureInsert(LectureReq lectureReq) {
-        if (lectureReq.getLectureName()==null || lectureReq.getLectureName().trim().isEmpty() ||
-            lectureReq.getTeacherId()==null || lectureReq.getTeacherId().trim().isEmpty()){
-            throw new IllegalStateException();
-        }
-
         if(lectureReq.getMaxPerson() <= 0){
             throw new TestException(TestHttpResponseCode.PERSON_ISSUE);
         }
-
         if (lectureReq.getMaxPerson() > 100) {
             throw new TestException(TestHttpResponseCode.PERSON_ISSUE);
         }
+
         Optional<Teacher> teacher = teacherRepository.findByTeacherId(lectureReq.getTeacherId());
         if (!teacher.isPresent()){
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
@@ -192,11 +187,8 @@ public class TeacherService {
 
     //추천된 학생 조회
     public ResponseEntity<Page<StudentDto>> recommendedStudentList(int page, int size, String sort) {
-        if(sort==null || sort.trim().isEmpty() || Integer.valueOf(page)==null || Integer.valueOf(size)==null){
-            throw new IllegalStateException();
-        }
 
-        Page<Student> studentList = studentRepository.findAllByJoinStatusNot("NO", PageRequest.of(page-1, size, Sort.Direction.ASC, sort));
+        Page<Student> studentList = studentRepository.findAllByJoinStatusNot("NO", PageRequest.of(page, size, Sort.Direction.ASC, sort));
         if(studentList.isEmpty()){
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }

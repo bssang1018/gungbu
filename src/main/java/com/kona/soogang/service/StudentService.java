@@ -36,11 +36,6 @@ public class StudentService {
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<StudentDto> studentJoin(StudentReq studentReq) {
-        if (studentReq.getName() == null || studentReq.getName().trim().isEmpty() ||
-                studentReq.getEmail() == null || studentReq.getEmail().trim().isEmpty()) {
-            throw new IllegalStateException();
-        }
-
         Optional<Student> student = studentRepository.findByEmail(studentReq.getEmail());
         if (!student.isPresent()) {
             //중복의 결과가 없다면 신규로 회원가입 진행
@@ -85,10 +80,6 @@ public class StudentService {
     //수강신청
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<RegisterDto> lectureRegister(RegisterReq registerReq) {
-        if (registerReq.getLectureName() == null || registerReq.getLectureName().trim().isEmpty() ||
-                registerReq.getEmail() == null || registerReq.getEmail().trim().isEmpty()) {
-            throw new IllegalStateException();
-        }
 
         //강의명과 email로 해당 키값 가져오기
         Optional<Lecture> lecture = lectureRepository.findByLectureName(registerReq.getLectureName());
@@ -159,10 +150,6 @@ public class StudentService {
     //수강신청 취소
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<RegisterDto> registerCancel(RegisterReq registerReq) {
-        if (registerReq.getLectureName() == null || registerReq.getLectureName().trim().isEmpty() ||
-                registerReq.getEmail() == null || registerReq.getEmail().trim().isEmpty()) {
-            throw new IllegalStateException();
-        }
 
         Optional<Lecture> lecture = lectureRepository.findByLectureName(registerReq.getLectureName());
         if (!lecture.isPresent()) {
@@ -178,6 +165,9 @@ public class StudentService {
 
         //검색한 결과가 있다면, 해당 레코드의 취소 상태를 업데이트
         Optional<Register> register = registerRepository.findByLecture_LectureCodeAndStudent_StudentNum(lectureCode, studentNum);
+        if (!register.isPresent()){
+            throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
+        }
 
         //이미 취소를 한 경우,
         if (register.get().getCancelStatus().equals("YES")) {
@@ -195,15 +185,12 @@ public class StudentService {
 
     //수강신청 리스트
     public ResponseEntity<Page<RegisterDto>> registerList(String email, int page, int size, String sort) {
-        if(email==null || email.trim().isEmpty() || sort==null || sort.trim().isEmpty() || Integer.valueOf(page)==null || Integer.valueOf(size)==null){
-            throw new IllegalStateException();
-        }
 
         Optional<Student> student = studentRepository.findByEmail(email);
         if (!student.isPresent()) {
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
-        Page<Register> registerList = registerRepository.findAllByStudent_StudentNumIs(student.get().getStudentNum(), PageRequest.of(page - 1, size, Sort.Direction.ASC, sort));
+        Page<Register> registerList = registerRepository.findAllByStudent_StudentNumIs(student.get().getStudentNum(), PageRequest.of(page, size, Sort.Direction.ASC, sort));
         Page<RegisterDto> registerDtos = registerList.map(RegisterDto::new);
         return new ResponseEntity<>(registerDtos, HttpStatus.OK);
     }
@@ -216,11 +203,9 @@ public class StudentService {
 
         Optional<Student> result = studentRepository.findByEmail(email);
         if (!result.isPresent()) {
-            //return "해당 이메일은 존재하지 않습니다. 이메일을 확인해주세요.";
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
         if (result.get().getJoinStatus().equals("NO")) {
-            //return "어떤 강사에게도 추천을 받지 못했습니다.";
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
         return new ResponseEntity<>(teacherRepository.findById(result.get().getTeacher().getTeacherNum()).get().getTeacherName(), HttpStatus.OK);

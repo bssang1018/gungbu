@@ -52,6 +52,9 @@ public class CommonController {
     @GetMapping(value = "/lectureList")
     public ResponseEntity<Page<LectureDto>> lectureList(int page, int size, String sort) {
         logger.info("강의 리스트 조회:: "+page+"/"+size+"/"+sort);
+        if(sort==null || sort.trim().isEmpty() || Integer.valueOf(page)==null || Integer.valueOf(size)==null || size <= 0 ){
+            throw new IllegalStateException();
+        }
         return commonService.lectureList(page, size, sort);
     }
 }

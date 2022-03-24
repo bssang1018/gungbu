@@ -14,6 +14,7 @@ public enum TestHttpResponseCode {
     CANT_CLOSE(HttpStatus.UNPROCESSABLE_ENTITY, "수강신청 인원이 2명 이상이기 때문에, 폐강할 수 없습니다."),
     PERSON_ISSUE(HttpStatus.UNPROCESSABLE_ENTITY, "수강인원은 최소 1명 부터 최대 100명 까지 설정 가능합니다.")
     ;
+
     private HttpStatus httpStatus;
     private String message;
 
