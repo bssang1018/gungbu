@@ -1,6 +1,5 @@
 package com.kona.soogang.dto;
 
-import com.kona.soogang.domain.Lecture;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,8 +20,6 @@ public class LectureReq {
     @NotEmpty
     private String lectureName;
 
-    @NotNull
-    @NotEmpty
     private int maxPerson;
 
 }

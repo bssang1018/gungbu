@@ -191,6 +191,9 @@ public class StudentService {
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
         }
         Page<Register> registerList = registerRepository.findAllByStudent_StudentNumIs(student.get().getStudentNum(), PageRequest.of(page, size, Sort.Direction.ASC, sort));
+        if (registerList.isEmpty()){
+            throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);
+        }
         Page<RegisterDto> registerDtos = registerList.map(RegisterDto::new);
         return new ResponseEntity<>(registerDtos, HttpStatus.OK);
     }
@@ -200,7 +203,6 @@ public class StudentService {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalStateException();
         }
-
         Optional<Student> result = studentRepository.findByEmail(email);
         if (!result.isPresent()) {
             throw new TestException(TestHttpResponseCode.RESULT_NOT_FOUND);

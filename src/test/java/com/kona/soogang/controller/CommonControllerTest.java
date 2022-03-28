@@ -41,8 +41,6 @@ public class CommonControllerTest extends TestCase {
 
     @Test
     public void 강의리트스테스트() throws Exception{
-        HashMap<String, Object> map = new HashMap<>();
-
         mvc.perform(get("/lectureList")
         .param("page",String.valueOf(1))
         .param("size", String.valueOf(1))

@@ -17,16 +17,16 @@ import javax.servlet.http.HttpServletRequest;
 public class TestExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
+    //커스텀 예외
+    @ExceptionHandler(value = TestException.class)
+    public ResponseEntity<String> handleValidityException(TestException e) {
+        return new ResponseEntity(e.getTestHttpResponseCode().getMessage(),e.getTestHttpResponseCode().getHttpStatus());
+    }
+
     //사용됨 이메일 형식이 아닌경우, 공백, null
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<String> dataVali(){
         return new ResponseEntity<>("데이터를 올바르게 입력해 주세요.", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    //커스텀 예외
-    @ExceptionHandler({TestException.class})
-    public ResponseEntity<String> handleValidityException(TestException e) {
-        return new ResponseEntity(e.getTestHttpResponseCode().getMessage(),e.getTestHttpResponseCode().getHttpStatus());
     }
 
     //공백입력 예외 (사용됨)
