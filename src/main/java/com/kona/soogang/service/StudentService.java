@@ -34,47 +34,57 @@ public class StudentService {
         this.teacherRepository = teacherRepository;
     }
 
+    /**
+    * 신규 학생가입
+    * */
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<StudentDto> newJoin(StudentReq studentReq){
+        Student studentForSave = new Student()
+                .builder()
+                .email(studentReq.getEmail())
+                .name(studentReq.getName())
+                .joinStatus("NO")
+                .build();
+        studentRepository.save(studentForSave);
+
+        StudentDto dto = new StudentDto().builder()
+                .studentNum(studentForSave.getStudentNum())
+                .email(studentForSave.getEmail())
+                .name(studentForSave.getName())
+                .joinStatus(studentForSave.getJoinStatus())
+                .build();
+        return new ResponseEntity<StudentDto>(dto, HttpStatus.CREATED);
+    }
+
+    /**
+     * 선생의 추천을 통해 가입된 학생의 상태를 업데이트
+     * */
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<StudentDto> joinStatusUp(Student student){
+        StudentDto dto = StudentDto.builder()
+                .studentNum(student.getStudentNum())
+                .email(student.getEmail())
+                .joinStatus(student.getJoinStatus())
+                .teacherNum(student.getTeacher().getTeacherNum())
+                .build();
+        return new ResponseEntity<StudentDto>(dto, HttpStatus.CREATED);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<StudentDto> studentJoin(StudentReq studentReq) {
         Optional<Student> student = studentRepository.findByEmail(studentReq.getEmail());
-        if (!student.isPresent()) {
-            //중복의 결과가 없다면 신규로 회원가입 진행
-            System.out.println("신규가입");
-            Student student1 = new Student()
-                    .builder()
-                    .email(studentReq.getEmail())
-                    .name(studentReq.getName())
-                    .joinStatus("NO")
-                    .build();
-            studentRepository.save(student1);
-
-            return new ResponseEntity<>(new StudentDto().builder()
-                    .studentNum(student1.getStudentNum())
-                    .email(student1.getEmail())
-                    .name(student1.getName())
-                    .joinStatus(student1.getJoinStatus())
-                    .build()
-                    , HttpStatus.CREATED);
-        }
-
         if (student.isPresent() && student.get().getJoinStatus().equals("BN")) {
             //중복결과가 존재하면서, 선생의 추천으로 이메일만 이미 디비에 등록된 경우
             //해당 레코드의 상태를 업데이트
             student.get().studentUpdate(studentReq.getName(), "BY");
-            //업데이트 하고 해당 레코드 조회해서 가져오기
-            Student student1 = studentRepository.findByEmail(studentReq.getEmail()).get();
-            return new ResponseEntity<>(new StudentDto().builder()
-                    .studentNum(student1.getStudentNum())
-                    .email(student1.getEmail())
-                    .joinStatus(student1.getJoinStatus())
-                    .teacherNum(student1.getTeacher().getTeacherNum())
-                    .build()
-                    , HttpStatus.CREATED);
-        } else {
+            joinStatusUp(student.get());
+        }else {
             //중복결과가 존재면면서, 상태가 NO, AY, BY면
             //단순 이메일 중복으로 인한 가입 거절
             throw new TestException(TestHttpResponseCode.IDOREMAIL_DUPLICATE);
         }
+        //조회결과 없다면 신규가입 진행
+        return newJoin(studentReq);
     }
 
     //수강신청

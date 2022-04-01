@@ -2,13 +2,11 @@ package com.kona.soogang.dto;
 
 import com.kona.soogang.domain.Student;
 import com.kona.soogang.domain.Teacher;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class StudentDto {
 

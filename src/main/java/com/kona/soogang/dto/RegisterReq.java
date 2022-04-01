@@ -5,20 +5,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Setter
 @Getter
 @NoArgsConstructor
 public class RegisterReq {
 
-    @NotNull
-    @NotEmpty
+    @NotBlank
     private String lectureName;
 
-    @NotNull
-    @NotEmpty
+    @NotBlank
     @Email
     private String email;
 

@@ -3,21 +3,19 @@ package com.kona.soogang.dto;
 import lombok.*;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class StudentReq {
 
-    @NotNull
+    @NotBlank
     @Email
-    @NotEmpty
     private String email;
 
-    @NotNull
-    @NotEmpty
+    @NotBlank
     private String name;
 
     @Builder
